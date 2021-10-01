@@ -31,7 +31,7 @@ namespace Rewind.Core
         }
         public string BuildToken(User user)
         {
-            string key = "randomKey";//_config["Jwt:Key"].ToString();
+            string key = "randomKeysyfufkdhdasdoufgasdduyfgaouefsfsjlgsdfjytausdyf";//_config["Jwt:Key"].ToString();
             string issuer = "www.rewind.so";//_config["Jwt:Issuer"].ToString();
             var claims = new[] {
             new Claim(ClaimTypes.Name, user.Username),
