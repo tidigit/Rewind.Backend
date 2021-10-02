@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Rewind.Core;
 using Rewind.Objects;
 using System;
@@ -35,11 +36,28 @@ namespace Rewind.Api.Controllers
             return new List<string>() {"Test" };
         }
 
+        [Route("Login")]
         [HttpPost]
-        public string Post(LoginRequest loginRequest)
+        public string Login(LoginRequest loginRequest)
         {
             var token = AccountCore.LoginUser(loginRequest);
             return token;
+        }
+
+        [Route("Signup")]
+        [HttpPost]
+        public string Signup(SignupRequest signupRequest)
+        {
+            var newUser = signupRequest.User;
+            if((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
+            {
+                var token = AccountCore.SignupUser(newUser);
+                return token;
+            }
+            else {
+                return null;
+            }
+            
         }
     }
 }

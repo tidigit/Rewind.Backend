@@ -16,6 +16,12 @@ namespace Rewind.Core
             return token;
         }
 
+        public static string SignupUser(User newUser)
+        {
+            var token = new TokenService().BuildToken(newUser);
+            return token;
+        }
+
 
 
     }
@@ -35,7 +41,7 @@ namespace Rewind.Core
             string issuer = "www.rewind.so";//_config["Jwt:Issuer"].ToString();
             var claims = new[] {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(ClaimTypes.Role, user.Email),
             new Claim(ClaimTypes.NameIdentifier,
             Guid.NewGuid().ToString())
         };

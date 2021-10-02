@@ -10,4 +10,8 @@ namespace Rewind.Objects
     {
         public User User { get; set; }
     }
+    public class SignupRequest
+    {
+        public User User { get; set; }
+    }
 }
