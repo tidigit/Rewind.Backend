@@ -65,9 +65,21 @@ namespace Rewind.Core
             try
             {
                 bool isUserAlreadyExists;
-                (_, isUserAlreadyExists) = AccountAccess.SearchAndRetrieveUser(newUser);
+                var userOnDatabase = new User();
+                (userOnDatabase, isUserAlreadyExists) = AccountAccess.SearchAndRetrieveUser(newUser);
                 if (isUserAlreadyExists)
                 {
+                    if (userOnDatabase != null)
+                    {
+                        if (userOnDatabase.Email == newUser.Email)
+                        {
+                            signupResponse.Code = SignupCodes.EmailAlreadyExists;
+                        }
+                        else if (userOnDatabase.Phone == newUser.Phone)
+                        {
+                            signupResponse.Code = SignupCodes.PhoneAlreadyExists;
+                        }
+                    }
                     signupResponse.Code = SignupCodes.UserAlreadyExists;
                 }
                 else

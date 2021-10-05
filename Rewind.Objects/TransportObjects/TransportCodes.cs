@@ -21,7 +21,8 @@ namespace Rewind.Objects.TransportObjects
     {
         public const int SignupSuccessful = 2100;
         public const int UserAlreadyExists = 2101;
-        
+        public const int EmailAlreadyExists = 2102;
+        public const int PhoneAlreadyExists = 2103;
     }
 
 

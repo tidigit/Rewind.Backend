@@ -20,7 +20,7 @@ namespace Rewind.Access
         }
 
         private static string DatabaseConnectionString { get; set; }
-        public static Tuple<User, bool, int> SearchAndRetrieveUser(User user)
+        public static Tuple<User, bool> SearchAndRetrieveUser(User user)
         {
             try
             {
@@ -28,7 +28,6 @@ namespace Rewind.Access
                 var userOnDatabase = new User();
                 var ds = new DataSet();
                 var isUserExists = false;
-                int existsBy;
                 using var connection = new SqlConnection(DatabaseConnectionString);
                 using var command = new SqlCommand("searchAndRetrieveUser", connection)
                 {
@@ -50,14 +49,6 @@ namespace Rewind.Access
                     userOnDatabase = usersOnDatabase.First(x => x.Phone == user.Phone || x.Email == user.Email);
                     if(userOnDatabase != null)
                     {
-                        if(userOnDatabase.Email == user.Email)
-                        {
-
-                        }
-                        else if(userOnDatabase.Phone == user.Phone)
-                        {
-
-                        }
                         isUserExists = true;
                     } 
                 }
