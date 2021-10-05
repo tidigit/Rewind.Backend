@@ -7,8 +7,14 @@ using Rewind.Objects;
 using Rewind.Objects.TransportObjects;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Web.Http;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace Rewind.Api.Controllers
 {
@@ -16,17 +22,11 @@ namespace Rewind.Api.Controllers
     [Route("[controller]")]
     public class AccountController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
-        private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _config;
 
-        public AccountController(IConfiguration config, ILogger<AccountController> logger)
+        public AccountController(IConfiguration config)
         {
-            _logger = logger;
+
             _config = config;
         }
 
@@ -34,56 +34,89 @@ namespace Rewind.Api.Controllers
         public IEnumerable<string> Get()
         {
             var rng = new Random();
-            return new List<string>() {"Test" };
+            return new List<string>() { "Test" };
         }
 
         [Route("Login")]
         [HttpPost]
-        public LoginResponse Login(LoginRequest loginRequest)
+        public IActionResult Login(LoginRequest loginRequest)
         {
             var loginResponse = new LoginResponse();
-            if(loginRequest != null && loginRequest.User != null)
+            try
             {
-                var user = loginRequest.User;
-                switch (loginRequest.LoginType)
+                if (loginRequest != null)
                 {
-                    case LoginType.Email: 
-                    case LoginType.Phone:
-                        if(!string.IsNullOrWhiteSpace(user.Email) || !string.IsNullOrWhiteSpace(user.Phone))
-                        {
-                            loginResponse = AccountCore.LoginUserByPhoneOrEmail(user);
-                        }
-                        break;
-                    case LoginType.AppleSignOn:
-                        break;
-                    default:
-                        break;
-
+                    switch (loginRequest.LoginType)
+                    {
+                        case LoginType.Email:
+                        case LoginType.Phone:
+                            if ((!string.IsNullOrWhiteSpace(loginRequest.Email) || !string.IsNullOrWhiteSpace(loginRequest.Phone)) && !string.IsNullOrWhiteSpace(loginRequest.Password))
+                            {
+                                var returningUser = new User()
+                                {
+                                    Email = loginRequest.Email,
+                                    Phone = loginRequest.Phone,
+                                    Password = loginRequest.Password
+                                };
+                                loginResponse = AccountCore.LoginUserByPhoneOrEmail(returningUser);
+                                return Ok(loginResponse);
+                            }
+                            else
+                            {
+                                return BadRequest();
+                            }
+                        case LoginType.AppleSignOn:
+                            return NotFound();
+                        default:
+                            return BadRequest();
+                    }
+                    
+                }
+                else
+                {
+                    loginResponse.Code = GeneralCodes.InsufficentData;
+                    return BadRequest();
                 }
             }
-            else
+            catch (Exception)
             {
-                loginResponse.Code = LoginCodes.InsufficentData;
+                throw new ArgumentException($"Internal Server Error - Please try again");
             }
-            return loginResponse;
         }
 
         [Route("Signup")]
         [HttpPost]
-        public SignupResponse Signup(SignupRequest signupRequest)
+        public IActionResult Signup(SignupRequest signupRequest)
         {
-            var newUser = signupRequest.User;
             var signupResponse = new SignupResponse();
-            if((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
+            try
             {
-                signupResponse = AccountCore.SignupUser(newUser);
+                var newUser = new User()
+                {
+                    Email = signupRequest.Email,
+                    Phone = signupRequest.Phone,
+                    Username = signupRequest.Username,
+                    Password = signupRequest.Password,
+                    FirstName = signupRequest.FirstName,
+                    LastName = signupRequest.Password,
+                    UserTimeZone = signupRequest.UserTimeZone
+                };
+                if ((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
+                {
+                    signupResponse = AccountCore.AddNewUser(newUser);
+                    return Ok(signupResponse);
+                }
+                else
+                {
+                    signupResponse.Code = GeneralCodes.InsufficentData;
+                    return BadRequest(signupResponse);
+                }
             }
-            else 
+            catch (Exception)
             {
-                signupResponse.Code = GeneralCodes.InsufficentData;
-                return null;
+                throw new ArgumentException($"Internal Server Error - Please try again");
             }
-            return signupResponse;
+
         }
     }
 }

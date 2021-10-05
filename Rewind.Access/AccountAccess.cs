@@ -46,7 +46,7 @@ namespace Rewind.Access
                 var usersOnDatabase = JsonConvert.DeserializeObject<List<User>>(table);
                 if(usersOnDatabase.Count > 0)
                 {
-                    userOnDatabase = usersOnDatabase.First(x => x.Phone == user.Phone || x.Email == user.Email);
+                    userOnDatabase = usersOnDatabase.First(x => x.Phone == user.Phone || x.Email == user.Email || x.Username == user.Username);
                     if(userOnDatabase != null)
                     {
                         isUserExists = true;

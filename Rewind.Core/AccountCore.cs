@@ -41,11 +41,13 @@ namespace Rewind.Core
                     else
                     {
                         loginResponse.Code = LoginCodes.WrongPassword;
+                        loginResponse.Description = LoginCodes.WrongPasswordDescription;
                     }
                 }
                 else
                 {
                     loginResponse.Code = LoginCodes.UserDoesnotExist;
+                    loginResponse.Description = LoginCodes.UserDoesnotExistDescription;
                 }
 
 
@@ -59,7 +61,7 @@ namespace Rewind.Core
 
         }
 
-        public static SignupResponse SignupUser(User newUser)
+        public static SignupResponse AddNewUser(User newUser)
         {
             var signupResponse = new SignupResponse();
             try
@@ -79,8 +81,16 @@ namespace Rewind.Core
                         {
                             signupResponse.Code = SignupCodes.PhoneAlreadyExists;
                         }
+                        else
+                        {
+                            signupResponse.Code = SignupCodes.UserAlreadyExists;
+                        }
+                        signupResponse.Description = SignupCodes.UserAlreadyExistDescription;
                     }
-                    signupResponse.Code = SignupCodes.UserAlreadyExists;
+                    else
+                    {
+                        signupResponse.Code = GeneralCodes.SomethingWentWrong;
+                    }
                 }
                 else
                 {
@@ -124,7 +134,7 @@ namespace Rewind.Core
             string key = "randomKeysyfufkdhdasdoufgasdduyfgaouefsfsjlgsdfjytausdyf";//_config["Jwt:Key"].ToString();
             string issuer = "www.rewind.so";//_config["Jwt:Issuer"].ToString();
             var claims = new[] {
-            new Claim(ClaimTypes.Name, user.Username),
+            //new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Email, user.Phone),
             new Claim(ClaimTypes.NameIdentifier,
