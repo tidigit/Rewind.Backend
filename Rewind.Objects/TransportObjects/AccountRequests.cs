@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rewind.Objects
+namespace Rewind.Objects.TransportObjects
 {
-    public class LoginRequest
+    public class LoginRequest: BaseRequest
+    {
+        public User User { get; set; }
+        public LoginType LoginType { get; set; }
+    }
+    public class SignupRequest: BaseRequest
     {
         public User User { get; set; }
     }
-    public class SignupRequest
-    {
-        public User User { get; set; }
-    }
+
+
 }

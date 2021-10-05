@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31515.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Core", "Rewind.Core\Rewind.Core.csproj", "{2B02E130-740E-4987-97AC-6100F2563224}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rewind.Core", "Rewind.Core\Rewind.Core.csproj", "{2B02E130-740E-4987-97AC-6100F2563224}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Access", "Rewind.Access\Rewind.Access.csproj", "{E250F87C-6AF4-4B5B-AC71-6E85872E4DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rewind.Access", "Rewind.Access\Rewind.Access.csproj", "{E250F87C-6AF4-4B5B-AC71-6E85872E4DA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Integration", "Rewind.Integration\Rewind.Integration.csproj", "{6770B3B3-7D17-4C4B-AB6D-D6E83BB2D88E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rewind.Integration", "Rewind.Integration\Rewind.Integration.csproj", "{6770B3B3-7D17-4C4B-AB6D-D6E83BB2D88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Objects", "Rewind.Objects\Rewind.Objects.csproj", "{F2F44F10-9347-4EC2-8C43-F1EDD7A7A01C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rewind.Objects", "Rewind.Objects\Rewind.Objects.csproj", "{F2F44F10-9347-4EC2-8C43-F1EDD7A7A01C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Api", "Rewind.Api\Rewind.Api.csproj", "{07479D46-FBAE-48EC-BA87-46D86E875B2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rewind.Api", "Rewind.Api\Rewind.Api.csproj", "{07479D46-FBAE-48EC-BA87-46D86E875B2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rewind.Utilities", "Rewind.Utilities\Rewind.Utilities.csproj", "{ABF8A3F0-0AAA-4616-9A63-49E330E2CFC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{07479D46-FBAE-48EC-BA87-46D86E875B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07479D46-FBAE-48EC-BA87-46D86E875B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07479D46-FBAE-48EC-BA87-46D86E875B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABF8A3F0-0AAA-4616-9A63-49E330E2CFC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABF8A3F0-0AAA-4616-9A63-49E330E2CFC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABF8A3F0-0AAA-4616-9A63-49E330E2CFC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABF8A3F0-0AAA-4616-9A63-49E330E2CFC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

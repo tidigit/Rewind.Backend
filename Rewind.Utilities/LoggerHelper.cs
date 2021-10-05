@@ -1,0 +1,20 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Rewind.Core
+{
+    public class LoggerHelper
+    {
+
+
+
+        public static void LogError(Exception exception)
+        {
+            //todo logging
+            Console.WriteLine(exception);
+        }
+    }
+}

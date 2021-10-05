@@ -5,11 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt-Official" Version="0.1.109" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Rewind.Access\Rewind.Access.csproj" />
     <ProjectReference Include="..\Rewind.Objects\Rewind.Objects.csproj" />
   </ItemGroup>
 

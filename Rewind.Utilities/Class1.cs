@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rewind.Access
+namespace Rewind.Utilities
 {
     public class Class1
     {

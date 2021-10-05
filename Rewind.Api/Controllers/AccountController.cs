@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Rewind.Core;
 using Rewind.Objects;
+using Rewind.Objects.TransportObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,26 +39,51 @@ namespace Rewind.Api.Controllers
 
         [Route("Login")]
         [HttpPost]
-        public string Login(LoginRequest loginRequest)
+        public LoginResponse Login(LoginRequest loginRequest)
         {
-            var token = AccountCore.LoginUser(loginRequest);
-            return token;
+            var loginResponse = new LoginResponse();
+            if(loginRequest != null && loginRequest.User != null)
+            {
+                var user = loginRequest.User;
+                switch (loginRequest.LoginType)
+                {
+                    case LoginType.Email: 
+                    case LoginType.Phone:
+                        if(!string.IsNullOrWhiteSpace(user.Email) || !string.IsNullOrWhiteSpace(user.Phone))
+                        {
+                            loginResponse = AccountCore.LoginUserByPhoneOrEmail(user);
+                        }
+                        break;
+                    case LoginType.AppleSignOn:
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+            else
+            {
+                loginResponse.Code = LoginCodes.InsufficentData;
+            }
+            return loginResponse;
         }
 
         [Route("Signup")]
         [HttpPost]
-        public string Signup(SignupRequest signupRequest)
+        public SignupResponse Signup(SignupRequest signupRequest)
         {
             var newUser = signupRequest.User;
+            var signupResponse = new SignupResponse();
             if((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
             {
-                var token = AccountCore.SignupUser(newUser);
-                return token;
+                signupResponse = AccountCore.SignupUser(newUser);
             }
-            else {
+            else 
+            {
+                signupResponse.Code = GeneralCodes.InsufficentData;
                 return null;
             }
-            
+            return signupResponse;
         }
     }
 }
