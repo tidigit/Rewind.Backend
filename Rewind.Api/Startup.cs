@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Rewind.Objects;
+using Rewind.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +55,12 @@ namespace Rewind.Api
                 };
             });
 
+
+            JwtConfig jwtConfig = new JwtConfig();
+            Configuration.GetSection("JwtConfig").Bind(jwtConfig);
+
+            //Create singleton from instance
+            services.AddSingleton(jwtConfig);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

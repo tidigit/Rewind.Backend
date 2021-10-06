@@ -1,4 +1,5 @@
-﻿using Rewind.Objects;
+﻿using Microsoft.Extensions.Configuration;
+using Rewind.Objects;
 using Rewind.Objects.MigrationObjects.DayOne;
 using System;
 using System.Collections.Generic;
@@ -8,32 +9,38 @@ using System.Threading.Tasks;
 
 namespace Rewind.Core
 {
-    class MigrationCore
+    public class MigrationCore
     {
-
-        void MapFromDayOneJson(DayOneJsonExport dayOneJsonExport)
+        private readonly IConfiguration _config;
+        public MigrationCore(IConfiguration configuration)
         {
-            var epicSchedules = new List<Story>();
+            _config = configuration;
+        }
+        public void MapFromDayOneJson(DayOneJsonExport dayOneJsonExport, int userId)
+        {
+            var stories = new List<Story>();
             foreach (var slot in dayOneJsonExport.entries)
             {
-                var epicSchedule = new Story();
-                epicSchedule.CreatedTimeStampInUtc = slot.creationDate;
-                epicSchedule.CreationDevice = new Device()
+                var story = new Story();
+                story.CreatedTimeStampInUtc = slot.creationDate;
+                story.CreationDevice = new Device()
                 {
                     DeviceName = slot.creationDevice,
                     DeviceOperatingSystem = slot.creationOSName
                 };
-                epicSchedule.Tags = slot.tags;
-                epicSchedule.IsFavorite = slot.starred;
-                epicSchedule.Body.MarkDownText = slot.text;
-                epicSchedule.Place.PlaceCoordinates = new PlaceCoordinates(slot.location?.latitude ?? slot.location?.region?.center.Latitude ?? 0,
+                story.Tags = slot.tags;
+                story.IsFavorite = slot.starred;
+                story.Body.MarkDownText = slot.text;
+                story.Place.PlaceCoordinates = new PlaceCoordinates(slot.location?.latitude ?? slot.location?.region?.center.Latitude ?? 0,
                     slot.location?.longitude ?? slot.location?.region?.center.Longitude ?? 0); //todo - get saved place from coordinates
-                epicSchedule.WeatherStamp = new WeatherStamp()
+                story.WeatherStamp = new WeatherStamp()
                 {
                     TemperatureInCelsius = slot.weather?.temperatureCelsius ?? 0,
                     Condition = slot.weather.weatherCode //todo - map from weathercode or conditions description
                 };
+                stories.Add(story);
             }
+            new StoryCore(_config).CreateStories(stories, userId);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace Rewind.Api.Controllers
                                     Phone = loginRequest.Phone,
                                     Password = loginRequest.Password
                                 };
-                                loginResponse = AccountCore.LoginUserByPhoneOrEmail(returningUser);
+                                loginResponse = new AccountCore(_config).LoginUserByPhoneOrEmail(returningUser);
                                 return Ok(loginResponse);
                             }
                             else
@@ -78,8 +78,9 @@ namespace Rewind.Api.Controllers
                     return BadRequest();
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LoggerHelper.LogError(exception);
                 throw new ArgumentException($"Internal Server Error - Please try again");
             }
         }
@@ -103,7 +104,7 @@ namespace Rewind.Api.Controllers
                 };
                 if ((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
                 {
-                    signupResponse = AccountCore.AddNewUser(newUser);
+                    signupResponse = new AccountCore(_config).AddNewUser(newUser);
                     return Ok(signupResponse);
                 }
                 else
@@ -112,8 +113,9 @@ namespace Rewind.Api.Controllers
                     return BadRequest(signupResponse);
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                LoggerHelper.LogError(exception);
                 throw new ArgumentException($"Internal Server Error - Please try again");
             }
 

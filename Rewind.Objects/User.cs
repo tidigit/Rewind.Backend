@@ -6,8 +6,6 @@ namespace Rewind.Objects
     public class User
     {
         public ObjectId _id { get; set; }
-        public int SqlDatabaseId { get; set; }
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }

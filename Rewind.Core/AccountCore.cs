@@ -5,15 +5,18 @@ using Rewind.Objects;
 using Rewind.Objects.TransportObjects;
 using Rewind.Utilities;
 using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace Rewind.Core
 {
     public class AccountCore
     {
-        public static LoginResponse LoginUserByPhoneOrEmail(User returningUser)
+        private readonly IConfiguration _config;
+        public AccountCore(IConfiguration configuration)
+        {
+            _config = configuration;
+        }
+        public LoginResponse LoginUserByPhoneOrEmail(User returningUser)
         {
             try
             {
@@ -21,7 +24,7 @@ namespace Rewind.Core
                 bool isUserExists;
                 bool isPasswordCorrect;
                 User userOnDatabase;
-                (userOnDatabase,isUserExists) = AccountAccess.SearchAndRetrieveUser(returningUser);
+                (userOnDatabase,isUserExists) = new AccountAccess(_config).SearchAndRetrieveUser(returningUser);
                 if (!string.IsNullOrWhiteSpace(userOnDatabase.PasswordHash))
                 {
                     try
@@ -35,7 +38,7 @@ namespace Rewind.Core
                     }
                     if (isPasswordCorrect)
                     {
-                        loginResponse.AccessToken = new TokenService().BuildToken(returningUser);
+                        loginResponse.AccessToken = new JwtHelper(_config).BuildToken(returningUser);
                         loginResponse.Code = GeneralCodes.TransactionSuccessful;
                     }
                     else
@@ -61,14 +64,14 @@ namespace Rewind.Core
 
         }
 
-        public static SignupResponse AddNewUser(User newUser)
+        public SignupResponse AddNewUser(User newUser)
         {
             var signupResponse = new SignupResponse();
             try
             {
                 bool isUserAlreadyExists;
                 var userOnDatabase = new User();
-                (userOnDatabase, isUserAlreadyExists) = AccountAccess.SearchAndRetrieveUser(newUser);
+                (userOnDatabase, isUserAlreadyExists) = new AccountAccess(_config).SearchAndRetrieveUser(newUser);
                 if (isUserAlreadyExists)
                 {
                     if (userOnDatabase != null)
@@ -95,10 +98,10 @@ namespace Rewind.Core
                 else
                 {
                     newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
-                    var createdUserId = AccountAccess.CreateNewUser(newUser);
+                    var createdUserId = new AccountAccess(_config).CreateNewUser(newUser);
                     if (createdUserId > 0)
                     {
-                        signupResponse.AccessToken = new TokenService().BuildToken(newUser);
+                        signupResponse.AccessToken = new JwtHelper(_config).BuildToken(newUser);
                         signupResponse.Code = GeneralCodes.TransactionSuccessful;
                     }
                     else
@@ -115,64 +118,7 @@ namespace Rewind.Core
             }
 
         }
-
-
-
     }
 
-
-    public class TokenService
-    {
-        private const double EXPIRY_DURATION_MINUTES = 30;
-
-        public TokenService()
-        {
-
-        }
-        public string BuildToken(User user)
-        {
-            string key = "randomKeysyfufkdhdasdoufgasdduyfgaouefsfsjlgsdfjytausdyf";//_config["Jwt:Key"].ToString();
-            string issuer = "www.rewind.so";//_config["Jwt:Issuer"].ToString();
-            var claims = new[] {
-            //new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Email, user.Phone),
-            new Claim(ClaimTypes.NameIdentifier,
-            Guid.NewGuid().ToString())
-        };
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
-            var tokenDescriptor = new JwtSecurityToken(issuer, issuer, claims,
-                expires: DateTime.Now.AddMinutes(EXPIRY_DURATION_MINUTES), signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-        }
-        public bool IsTokenValid(string token)
-        {
-            string key = "randomKeysyfufkdhdasdoufgasdduyfgaouefsfsjlgsdfjytausdyf";//_config["Jwt:Key"].ToString();
-            string issuer = "www.rewind.so";//_config["Jwt:Issuer"].ToString();
-            var mySecret = Encoding.UTF8.GetBytes(key);
-            var mySecurityKey = new SymmetricSecurityKey(mySecret);
-            var tokenHandler = new JwtSecurityTokenHandler();
-            try
-            {
-                tokenHandler.ValidateToken(token,
-                new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = issuer,
-                    IssuerSigningKey = mySecurityKey,
-                }, out SecurityToken validatedToken);
-            }
-            catch
-            {
-                return false;
-            }
-            return true;
-        }
-    }
 
 }

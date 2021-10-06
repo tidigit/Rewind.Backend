@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Rewind.Core;
 using Rewind.Objects;
@@ -13,18 +15,25 @@ namespace Rewind.Access
 {
     public class AccountAccess
     {
-        private static void SetConfig()
+        private readonly IConfiguration _config;
+        public AccountAccess(IConfiguration configuration)
         {
-            //todo load connection string from settings
-            DatabaseConnectionString = "Server=tcp:blanker.database.windows.net,1433;Initial Catalog=dev.rewind;Persist Security Info=False;User ID=blank;Password=hakunaMATATA02@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            _config = configuration;
+            DatabaseConnectionString = _config.GetConnectionString("SqlServerConnectionString");
         }
+        //public AccountAccess()
+        //{
+        //    var appSettings = ConfigurationManager.AppSettings;
 
-        private static string DatabaseConnectionString { get; set; }
-        public static Tuple<User, bool> SearchAndRetrieveUser(User user)
+        //   //todo load connection string from settings
+        //   //DatabaseConnectionString = ConfigurationManager.ConnectionStrings["SqlServerConnectionString"].ConnectionString;
+        //    //DatabaseConnectionString = "Server=tcp:blanker.database.windows.net,1433;Initial Catalog=dev.rewind;Persist Security Info=False;User ID=blank;Password=hakunaMATATA02@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        //}
+        private string DatabaseConnectionString { get; set; }
+        public Tuple<User, bool> SearchAndRetrieveUser(User user)
         {
             try
             {
-                SetConfig();
                 var userOnDatabase = new User();
                 var ds = new DataSet();
                 var isUserExists = false;
@@ -64,11 +73,10 @@ namespace Rewind.Access
 
         }
 
-        public static int CreateNewUser(User user)
+        public int CreateNewUser(User user)
         {
             try
             {
-                SetConfig();
                 int newUserId;
                 var ds = new DataSet();
                 using var connection = new SqlConnection(DatabaseConnectionString);

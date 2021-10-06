@@ -10,6 +10,7 @@ namespace Rewind.Objects
     public class Story
     {
         public ObjectId _id { get; set; }
+        public ObjectId _userId { get; set; }
         public DateTime CreatedTimeStampInUtc { get; set; }
         public DateTime LastModifiedTimeStampInUtc { get; set; }
         public Place Place { get; set; }
