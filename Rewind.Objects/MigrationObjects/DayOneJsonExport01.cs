@@ -119,7 +119,7 @@ namespace Rewind.Objects.MigrationObjects.DayOne
         public Music music { get; set; }
     }
 
-    public class DayOneJsonExport
+    public class DayOneJsonExport01
     {
         public Metadata metadata { get; set; }
         public List<Entry> entries { get; set; }

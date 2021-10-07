@@ -23,13 +23,13 @@ namespace Rewind.Api.Controllers
         }
 
 
-        [Route("Migrations/DayOne")]
+        [Route("Migration")]
         [HttpPost]
-        public IActionResult MigrateFromDayOne(DayOneMigrationRequest dayOneMigrationRequest)
+        public IActionResult MigrateFromThirdPartyApplication(MigrationRequest migrationRequest)
         {
-            if(dayOneMigrationRequest != null && dayOneMigrationRequest.DayOneJsonExport?.entries?.Count > 0)
+            if(migrationRequest != null && migrationRequest.MigrationExport != null)
             {
-                new MigrationCore(_config).MapFromDayOneJson(dayOneMigrationRequest.DayOneJsonExport, dayOneMigrationRequest.UserId);
+                new MigrationCore(_config).MigrateFromThirdPartyApplication(migrationRequest.MigrationExport, migrationRequest.ThirdPartyApplication, migrationRequest.UserId);
             }
             else
             {

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Rewind.Objects;
+using Rewind.Objects.MigrationObjects;
 using Rewind.Objects.MigrationObjects.DayOne;
 using System;
 using System.Collections.Generic;
@@ -16,9 +18,34 @@ namespace Rewind.Core
         {
             _config = configuration;
         }
-        public void MapFromDayOneJson(DayOneJsonExport dayOneJsonExport, int userId)
+        public void MigrateFromThirdPartyApplication(IMigrationExport migrationExport, ThirdPartyApplicationCode thirdPartyApplication, int userId)
         {
             var stories = new List<Story>();
+            try
+            {
+                switch (thirdPartyApplication)
+                {
+                    case ThirdPartyApplicationCode.DayOne:
+                        //find the current schema from the request
+                        MigrationExport dayOnemigrationExport = (MigrationExport)migrationExport;
+                        MapFromDayOneJson(dayOnemigrationExport.Data);
+                        break;
+                    default:
+                        break;
+                }
+                new StoryCore(_config).CreateStories(stories, userId);
+            }
+            catch (Exception exception)
+            {
+                LoggerHelper.LogError(exception);
+            }
+
+        }
+
+        private List<Story> MapFromDayOneJson(string migrationObjectString)
+        {
+            var stories = new List<Story>();
+            var dayOneJsonExport = JsonConvert.DeserializeObject<DayOneJsonExport01>(migrationObjectString);
             foreach (var slot in dayOneJsonExport.entries)
             {
                 var story = new Story();
@@ -40,7 +67,8 @@ namespace Rewind.Core
                 };
                 stories.Add(story);
             }
-            new StoryCore(_config).CreateStories(stories, userId);
+            return stories;
         }
+
     }
 }

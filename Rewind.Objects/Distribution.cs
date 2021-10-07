@@ -12,8 +12,6 @@ namespace Rewind.Objects
         public DeviceOperatingSystem DeviceOperatingSystem { get; set; }
         public DeviceModel DeviceModel { get; set; }
         public string OperatingSystemVersion { get; set; }
-
-
     }
 
     public enum DeviceType
