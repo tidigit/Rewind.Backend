@@ -5,7 +5,7 @@ using Rewind.Objects;
 using Rewind.Objects.TransportObjects;
 using Rewind.Utilities;
 using System;
-
+using System.Threading.Tasks;
 
 namespace Rewind.Core
 {
@@ -16,20 +16,20 @@ namespace Rewind.Core
         {
             _config = configuration;
         }
-        public LoginResponse LoginUserByPhoneOrEmail(User returningUser)
+        public LoginResponse LoginUserByPhoneOrEmail(Account returningUserAccount)
         {
             try
             {
                 var loginResponse = new LoginResponse();
                 bool isUserExists;
                 bool isPasswordCorrect;
-                User userOnDatabase;
-                (userOnDatabase,isUserExists) = new AccountAccess(_config).SearchAndRetrieveUser(returningUser);
+                Account userOnDatabase;
+                (userOnDatabase, isUserExists) = new AccountAccess(_config).SearchAndRetrieveUserAccount(returningUserAccount);
                 if (!string.IsNullOrWhiteSpace(userOnDatabase.PasswordHash))
                 {
                     try
                     {
-                        isPasswordCorrect = BCrypt.Net.BCrypt.Verify(returningUser.Password, userOnDatabase.PasswordHash);
+                        isPasswordCorrect = BCrypt.Net.BCrypt.Verify(returningUserAccount.Password, userOnDatabase.PasswordHash);
                     }
                     catch (Exception exception)
                     {
@@ -38,7 +38,7 @@ namespace Rewind.Core
                     }
                     if (isPasswordCorrect)
                     {
-                        loginResponse.AccessToken = new JwtHelper(_config).BuildToken(returningUser);
+                        loginResponse.AccessToken = new JwtHelper(_config).BuildToken(returningUserAccount);
                         loginResponse.Code = GeneralCodes.TransactionSuccessful;
                     }
                     else
@@ -64,23 +64,23 @@ namespace Rewind.Core
 
         }
 
-        public SignupResponse AddNewUser(User newUser)
+        public async Task<SignupResponse> AddNewUserAsync(Account newUserAccount)
         {
             var signupResponse = new SignupResponse();
             try
             {
                 bool isUserAlreadyExists;
-                var userOnDatabase = new User();
-                (userOnDatabase, isUserAlreadyExists) = new AccountAccess(_config).SearchAndRetrieveUser(newUser);
+                var userAccountOnDatabase = new Account();
+                (userAccountOnDatabase, isUserAlreadyExists) = new AccountAccess(_config).SearchAndRetrieveUserAccount(newUserAccount);
                 if (isUserAlreadyExists)
                 {
-                    if (userOnDatabase != null)
+                    if (userAccountOnDatabase != null)
                     {
-                        if (userOnDatabase.Email == newUser.Email)
+                        if (userAccountOnDatabase.Email == newUserAccount.Email)
                         {
                             signupResponse.Code = SignupCodes.EmailAlreadyExists;
                         }
-                        else if (userOnDatabase.Phone == newUser.Phone)
+                        else if (userAccountOnDatabase.Phone == newUserAccount.Phone)
                         {
                             signupResponse.Code = SignupCodes.PhoneAlreadyExists;
                         }
@@ -97,11 +97,17 @@ namespace Rewind.Core
                 }
                 else
                 {
-                    newUser.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
-                    var createdUserId = new AccountAccess(_config).CreateNewUser(newUser);
-                    if (createdUserId > 0)
+                    if (!string.IsNullOrWhiteSpace(newUserAccount.Password))
                     {
-                        signupResponse.AccessToken = new JwtHelper(_config).BuildToken(newUser);
+                        newUserAccount.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUserAccount.Password);
+                    }
+                    var newUser = AccountHelper.MapUserFromAccount(newUserAccount);
+                    var userIdentifier = await new UserAccess(_config).InsertUserOnMongoDBAsync(newUser);
+                    newUserAccount.UserIdentifier = userIdentifier;
+                    var createdUserId = new AccountAccess(_config).CreateNewUserAccountAsync(newUserAccount);
+                    if (!string.IsNullOrWhiteSpace(createdUserId))
+                    {
+                        signupResponse.AccessToken = new JwtHelper(_config).BuildToken(newUserAccount);
                         signupResponse.Code = GeneralCodes.TransactionSuccessful;
                     }
                     else

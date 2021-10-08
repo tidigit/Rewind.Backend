@@ -9,7 +9,6 @@ namespace Rewind.Objects.TransportObjects
 {
     public class MigrationRequest: BaseRequest
     {
-        public int UserId { get; set; }
         public IMigrationExport MigrationExport { get; set; }
         public ThirdPartyApplicationCode ThirdPartyApplication { get; set; }
     }

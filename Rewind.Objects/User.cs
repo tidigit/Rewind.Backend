@@ -1,18 +1,27 @@
-﻿using System;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Rewind.Objects
 {
     public class User
     {
-        public ObjectId _id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string Phone { get; set; }
-        public string PasswordHash { get; set; }
+        public ObjectId Id { get; set; }
+        public UserProfile UserProfile { get; set; }
+        public UserSettings UserSettings { get; set; }
+
+    }
+
+    public class UserSettings
+    {
         public string UserTimeZone { get; set; }
+    }
+
+    public class UserProfile : HumanProfile
+    {
+        public string ProfilePhoto { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Rewind.Core;
 using Rewind.Objects.TransportObjects;
 using System;
 using System.Collections.Generic;
@@ -13,21 +15,40 @@ namespace Rewind.Api.Controllers
     [ApiController]
     public class StoriesController : ControllerBase
     {
+        private readonly IConfiguration _config;
 
-        [Route("Stories")]
-        [HttpGet("{id}")]
+        public StoriesController(IConfiguration config)
+        {
+            _config = config;
+        }
+
+
+        [HttpGet("Retrieve/{id}")]
         public string RetrieveStoryById(int id)
         {
             return "value";
         }
 
 
-        [Route("Stories")]
+        [Route("Retrieve")]
         [HttpPost]
-        public IActionResult RetrieveStoriesByView(StoriesRequest storiesRequest)
+        public IActionResult RetrieveStoriesByView(RetrieveStoriesRequest storiesRequest)
         {
 
             throw new NotImplementedException();
+        }
+
+
+        [Route("Create")]
+        [HttpPost]
+        public IActionResult CreateStory(CreateStoryRequest createStoryRequest)
+        {
+            if(createStoryRequest != null)
+            {
+                new StoryCore(_config).CreateStories(createStoryRequest.StoriesToCreate, createStoryRequest.UserId);
+            }
+            //todo validations and operation success result
+            return Ok(true);
         }
 
 

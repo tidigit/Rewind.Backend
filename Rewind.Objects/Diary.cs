@@ -36,7 +36,7 @@ namespace Rewind.Objects
         public List<Contributor> Contributors { get; set; }
     }
 
-    public class Contributor : User
+    public class Contributor : Account
     {
         public DiaryAccessType AccessType { get; set; }
     }

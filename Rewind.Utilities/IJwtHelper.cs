@@ -9,6 +9,6 @@ namespace Rewind.Utilities
 {
     public interface IJwtHelper
     {
-        string BuildToken(User user);
+        string BuildToken(Account user);
     }
 }

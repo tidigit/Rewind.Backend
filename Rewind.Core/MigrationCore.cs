@@ -18,7 +18,7 @@ namespace Rewind.Core
         {
             _config = configuration;
         }
-        public void MigrateFromThirdPartyApplication(IMigrationExport migrationExport, ThirdPartyApplicationCode thirdPartyApplication, int userId)
+        public void MigrateFromThirdPartyApplication(IMigrationExport migrationExport, ThirdPartyApplicationCode thirdPartyApplication, string userId)
         {
             var stories = new List<Story>();
             try

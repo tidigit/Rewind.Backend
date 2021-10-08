@@ -11,7 +11,7 @@ namespace Rewind.Objects.TransportObjects
     public class AccountResponse: BaseResponse
     {
         public string AccessToken { get; set; }
-        public User User { get; set; }
+        public Account User { get; set; }
     }
 
     public class LoginResponse: AccountResponse

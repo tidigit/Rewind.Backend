@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 using Rewind.Access;
 using Rewind.Objects;
 using System;
@@ -21,10 +22,18 @@ namespace Rewind.Core
             throw new NotImplementedException();
         }
 
-        internal async void CreateStories(List<Story> stories, int userId)
+        public async void CreateStories(List<Story> stories, string userId)
         {
-            await new StoryAccess(_config).CreateStoriesAsync(stories);
-            throw new NotImplementedException();
+            try
+            {
+                _ = stories.Select(x => x._userId == new ObjectId(userId));
+                await new StoryAccess(_config).CreateStoriesAsync(stories);
+            }
+            catch (Exception exception)
+            {
+                LoggerHelper.LogError(exception);
+                throw;
+            }
         }
     }
 }

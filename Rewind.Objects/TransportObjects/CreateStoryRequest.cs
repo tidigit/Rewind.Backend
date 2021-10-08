@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Rewind.Objects.TransportObjects
 {
-    public class BaseRequest
+    public class CreateStoryRequest: BaseRequest
     {
-        public int Flag { get; set; }
-        public Distribution Distribution { get; set; }
-        public string UserId { get; set; }
+        public List<Story> StoriesToCreate { get; set; }
     }
 }

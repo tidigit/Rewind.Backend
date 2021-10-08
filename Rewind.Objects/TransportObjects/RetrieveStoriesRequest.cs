@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rewind.Objects.TransportObjects
 {
-    public class StoriesRequest: BaseRequest
+    public class RetrieveStoriesRequest: BaseRequest
     {
         public ViewType ViewType { get; set; }
         public Context SearchCriteria { get; set; }

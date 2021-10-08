@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 using Newtonsoft.Json;
 using Rewind.Core;
 using Rewind.Objects;
@@ -13,28 +14,19 @@ using Rewind.Objects.AccessObjects;
 
 namespace Rewind.Access
 {
-    public class AccountAccess
+    public class AccountAccess : BaseAccess
     {
         private readonly IConfiguration _config;
-        public AccountAccess(IConfiguration configuration)
+        public AccountAccess(IConfiguration configuration): base(configuration)
         {
-            _config = configuration;
-            DatabaseConnectionString = _config.GetConnectionString("SqlServerConnectionString");
-        }
-        //public AccountAccess()
-        //{
-        //    var appSettings = ConfigurationManager.AppSettings;
 
-        //   //todo load connection string from settings
-        //   //DatabaseConnectionString = ConfigurationManager.ConnectionStrings["SqlServerConnectionString"].ConnectionString;
-        //    //DatabaseConnectionString = "Server=tcp:blanker.database.windows.net,1433;Initial Catalog=dev.rewind;Persist Security Info=False;User ID=blank;Password=hakunaMATATA02@;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        //}
-        private string DatabaseConnectionString { get; set; }
-        public Tuple<User, bool> SearchAndRetrieveUser(User user)
+        }
+        
+        public Tuple<Account, bool> SearchAndRetrieveUserAccount(Account userAccount)
         {
             try
             {
-                var userOnDatabase = new User();
+                var userOnDatabase = new Account();
                 var ds = new DataSet();
                 var isUserExists = false;
                 using var connection = new SqlConnection(DatabaseConnectionString);
@@ -42,9 +34,9 @@ namespace Rewind.Access
                 {
                     CommandType = CommandType.StoredProcedure
                 };
-                _ = command.Parameters.AddWithValue("@username", user.Username);
-                _ = command.Parameters.AddWithValue("@email", user.Email);
-                _ = command.Parameters.AddWithValue("@phone", user.Phone);
+                _ = command.Parameters.AddWithValue("@username", userAccount.Username);
+                _ = command.Parameters.AddWithValue("@email", userAccount.Email);
+                _ = command.Parameters.AddWithValue("@phone", userAccount.Phone);
                 command.CommandTimeout = 5000;
                 connection.Open();
 
@@ -52,16 +44,16 @@ namespace Rewind.Access
                 _ = sqlAdaptor.Fill(ds);
 
                 var table = JsonConvert.SerializeObject(ds.Tables[0]);
-                var usersOnDatabase = JsonConvert.DeserializeObject<List<User>>(table);
+                var usersOnDatabase = JsonConvert.DeserializeObject<List<Account>>(table);
                 if(usersOnDatabase.Count > 0)
                 {
-                    userOnDatabase = usersOnDatabase.First(x => x.Phone == user.Phone || x.Email == user.Email || x.Username == user.Username);
+                    userOnDatabase = usersOnDatabase.First(x => x.Phone == userAccount.Phone || x.Email == userAccount.Email || x.Username == userAccount.Username);
                     if(userOnDatabase != null)
                     {
                         isUserExists = true;
                     } 
                 }
-                return new Tuple<User, bool>(userOnDatabase, isUserExists);
+                return new Tuple<Account, bool>(userOnDatabase, isUserExists);
             }
             catch(Exception exception)
             {
@@ -73,23 +65,24 @@ namespace Rewind.Access
 
         }
 
-        public int CreateNewUser(User user)
+        public string CreateNewUserAccountAsync(Account userAccount)
         {
             try
             {
-                int newUserId;
+                var newUserId = "";
                 var ds = new DataSet();
                 using var connection = new SqlConnection(DatabaseConnectionString);
                 using var command = new SqlCommand("createUser", connection)
                 {
                     CommandType = CommandType.StoredProcedure
                 };
-                _ = command.Parameters.AddWithValue("@firstname", user.FirstName);
-                _ = command.Parameters.AddWithValue("@lastname", user.LastName);
-                _ = command.Parameters.AddWithValue("@username", string.IsNullOrWhiteSpace(user.Username) ? DBNull.Value : user.Username);
-                _ = command.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(user.Email) ? DBNull.Value : user.Email);
-                _ = command.Parameters.AddWithValue("@passwordhash", string.IsNullOrWhiteSpace(user.PasswordHash) ? DBNull.Value : user.PasswordHash);
-                _ = command.Parameters.AddWithValue("@phone", string.IsNullOrWhiteSpace(user.Phone) ? DBNull.Value : user.Phone);
+                _ = command.Parameters.AddWithValue("@firstname", userAccount.FirstName);
+                _ = command.Parameters.AddWithValue("@lastname", userAccount.LastName);
+                _ = command.Parameters.AddWithValue("@username", string.IsNullOrWhiteSpace(userAccount.Username) ? DBNull.Value : userAccount.Username);
+                _ = command.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(userAccount.Email) ? DBNull.Value : userAccount.Email);
+                _ = command.Parameters.AddWithValue("@passwordhash", string.IsNullOrWhiteSpace(userAccount.PasswordHash) ? DBNull.Value : userAccount.PasswordHash);
+                _ = command.Parameters.AddWithValue("@phone", string.IsNullOrWhiteSpace(userAccount.Phone) ? DBNull.Value : userAccount.Phone);
+                //todo - add useridentifier
                 command.CommandTimeout = 5000;
                 connection.Open();
 
@@ -98,7 +91,10 @@ namespace Rewind.Access
 
                 var table = JsonConvert.SerializeObject(ds.Tables[0]);
                 var insertObjects = JsonConvert.DeserializeObject<List<Insertion>>(table);
-                newUserId = Convert.ToInt32(insertObjects[0].InsertedId);
+                if(insertObjects.Count > 0)
+                {
+                    newUserId = Convert.ToString(insertObjects[0].InsertedId);
+                }
                 return newUserId;
             }
             catch (Exception exception)
@@ -108,6 +104,7 @@ namespace Rewind.Access
             }
 
         }
+
 
     }
 }

@@ -29,12 +29,12 @@ namespace Rewind.Utilities
             Issuer = JwtConfig["Issuer"];
         }
 
-        public string BuildToken(User user)
+        public string BuildToken(Account user)
         {
             var claims = new[] {
-            //new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Actor, user.UserIdentifier ?? "Temporary"),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Email, user.Phone),
+            new Claim(ClaimTypes.MobilePhone, user.Phone),
             new Claim(ClaimTypes.NameIdentifier,
             Guid.NewGuid().ToString())
         };

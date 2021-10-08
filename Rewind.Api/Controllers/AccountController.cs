@@ -19,7 +19,7 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 namespace Rewind.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -52,7 +52,7 @@ namespace Rewind.Api.Controllers
                         case LoginType.Phone:
                             if ((!string.IsNullOrWhiteSpace(loginRequest.Email) || !string.IsNullOrWhiteSpace(loginRequest.Phone)) && !string.IsNullOrWhiteSpace(loginRequest.Password))
                             {
-                                var returningUser = new User()
+                                var returningUser = new Account()
                                 {
                                     Email = loginRequest.Email,
                                     Phone = loginRequest.Phone,
@@ -87,24 +87,23 @@ namespace Rewind.Api.Controllers
 
         [Route("Signup")]
         [HttpPost]
-        public IActionResult Signup(SignupRequest signupRequest)
+        public async Task<IActionResult> SignupAsync(SignupRequest signupRequest)
         {
             var signupResponse = new SignupResponse();
             try
             {
-                var newUser = new User()
+                var newUserAccount = new Account()
                 {
                     Email = signupRequest.Email,
                     Phone = signupRequest.Phone,
                     Username = signupRequest.Username,
                     Password = signupRequest.Password,
                     FirstName = signupRequest.FirstName,
-                    LastName = signupRequest.Password,
-                    UserTimeZone = signupRequest.UserTimeZone
+                    LastName = signupRequest.LastName
                 };
-                if ((!string.IsNullOrWhiteSpace(newUser.Email) || !string.IsNullOrWhiteSpace(newUser.Phone)) && !string.IsNullOrWhiteSpace(newUser.Password))
+                if ((!string.IsNullOrWhiteSpace(newUserAccount.Email) || !string.IsNullOrWhiteSpace(newUserAccount.Phone)))
                 {
-                    signupResponse = new AccountCore(_config).AddNewUser(newUser);
+                    signupResponse = await new AccountCore(_config).AddNewUserAsync(newUserAccount);
                     return Ok(signupResponse);
                 }
                 else

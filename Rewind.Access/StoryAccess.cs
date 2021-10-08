@@ -10,32 +10,11 @@ using System.Threading.Tasks;
 
 namespace Rewind.Access
 {
-    public class StoryAccess
+    public class StoryAccess : BaseAccess
     {
-        private readonly IConfiguration Configuration;
-        public static MongoClient RewindMongoDbClient { get; set; }
-        public static IMongoDatabase RewindDatabase { get; set; }
-        public StoryAccess(IConfiguration configuration)
+        public StoryAccess(IConfiguration configuration) : base(configuration)
         {
-            Configuration = configuration;
-            var mongoDbConnectionString = Configuration.GetConnectionString("MongoDbConnectionString");
-            var mongoDbSettings = Configuration.GetSection("MongoDbSettings");
-            var mongoDbDatabaseName = mongoDbSettings["mongoDbDatabaseName"];
-            var settings = MongoClientSettings.FromConnectionString(mongoDbConnectionString);
-            RewindMongoDbClient = new MongoClient(settings);
-            RewindDatabase = RewindMongoDbClient.GetDatabase(mongoDbDatabaseName);
-            SetMongoConventions();
-        }
 
-        private static void SetMongoConventions()
-        {
-            ConventionPack rewindConventionPack = new ConventionPack();
-            rewindConventionPack.Add(new CamelCaseElementNameConvention());
-            //{
-            //new SeperateWordsNamingConvention(),
-            //new LowerCaseElementNameConvetion()
-            //};
-            ConventionRegistry.Register("dev", rewindConventionPack, t => t.FullName.StartsWith("Rewind."));
         }
 
         public async Task<bool> CreateStoryAsync(Story storyToBeCreated)

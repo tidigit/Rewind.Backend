@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using Rewind.Objects.Stories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Rewind.Objects
         public int DiaryIdentifier { get; set; }
         public List<int> DiarySectionIdentifiers { get; set; }
         public List<string> Tags { get; set; }
-        public List<IMention> Mentions { get; set; }
+        public List<Mention> Mentions { get; set; }
         public Body Body { get; set; }
         public Cover Cover { get; set; }
 
@@ -44,7 +45,7 @@ namespace Rewind.Objects
 
     }
 
-    public class Person: IMention
+    public class Person: Mention
     {
     }
 
