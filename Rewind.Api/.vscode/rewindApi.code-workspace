@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "..\\..\\Rewind.Core"
+		},
+		{
+			"path": "..\\..\\Rewind.Databases"
+		},
+		{
+			"path": "..\\..\\Rewind.Integration"
+		},
+		{
+			"path": "..\\..\\Rewind.Objects"
+		},
+		{
+			"path": "..\\..\\Rewind.PlayGround"
+		},
+		{
+			"path": "..\\..\\Rewind.Utilities"
+		},
+		{
+			"path": "..\\..\\Rewind.Access"
+		}
+	],
+	"settings": {}
+}

@@ -16,13 +16,12 @@ namespace Rewind.Objects
         public DateTime CreatedTimeStampInUtc { get; set; }
         public DateTime LastModifiedTimeStampInUtc { get; set; }
         public bool IsArchived { get; set; }
-        public bool IsDiarySectionsEnabled { get; set; }
+        public bool IsCurationsEnabled { get; set; }
         public ObjectId DefaultTemplateId { get; set; }
-        public List<Section> Sections { get; set; }
+        public List<Collection> Collections { get; set; }
+        public List<Curation> Curations { get; set; }
         public PartnerSettings PartnerSettings { get; set; }
         public LegacySettings LegacySettings { get; set; }
-
-
     }
 
     public class LegacySettings
@@ -41,13 +40,7 @@ namespace Rewind.Objects
         public DiaryAccessType AccessType { get; set; }
     }
 
-    public class Section
-    {
-        public ObjectId _id { get; set; }
-        public string Name { get; set; }
-        public string Icon { get; set; }
-        public List<AutomationRule> AutomationRules { get; set; }
-    }
+
 
     public class AutomationRule
     {
