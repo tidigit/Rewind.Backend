@@ -60,7 +60,7 @@ namespace Rewind.Api.Controllers
         {
             if(createDiaryRequest != null)
             {
-                new DiaryCore(_config).CreateDiary(createDiaryRequest.DiaryToCreate, createDiaryRequest.UserId);
+                new DiaryCore(_config).CreateDiary(createDiaryRequest.DiaryName, createDiaryRequest.UserId);
             }
             //todo validations and operation success result
             return Ok(true);
