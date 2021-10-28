@@ -19,17 +19,49 @@ namespace Rewind.Core
             _config = configuration;
         }
 
-        public async void CreateDiary(Diary diaryToBeCreated, string userId)
+        public async Task<Diary> RetrieveDiaryAsync(string diaryId)
         {
+            var diary = new Diary();
             try
             {
-                await new DiaryAccess(_config).CreateDiaryAsync(diaryToBeCreated);
+                diary = await new DiaryAccess(_config).RetrieveDiaryAsync(diaryId);
+                return diary;
             }
             catch (Exception exception)
             {
                 LoggerHelper.LogError(exception);
                 throw;
             }
+        }
+
+        public async Task<bool> CreateDiaryAsync(CreateDiaryRequest createDiaryRequest)
+        {
+            var isCreationSuccessful = false;
+            try
+            {
+                var diaryToBeCreated = await ViewToObjectAsync(createDiaryRequest);
+                diaryToBeCreated.CreatedTimeStampInUtc = DateTime.UtcNow;
+                diaryToBeCreated.LastModifiedTimeStampInUtc = DateTime.UtcNow;
+                isCreationSuccessful = await new DiaryAccess(_config).CreateDiaryAsync(diaryToBeCreated);
+                return isCreationSuccessful;
+            }
+            catch (Exception exception)
+            {
+                LoggerHelper.LogError(exception);
+                throw;
+            }
+        }
+
+        private async Task<Diary> ViewToObjectAsync(CreateDiaryRequest createDiaryRequest)
+        {
+            var diaryObject = new Diary();
+            diaryObject.Name = createDiaryRequest.DiaryName;
+            diaryObject.CoverId = ObjectId.GenerateNewId(); //new ObjectId(createDiaryRequest.CoverId.Id);
+            diaryObject.ColorId = ObjectId.GenerateNewId(); //new ObjectId(createDiaryRequest.ColorId.Id);
+            diaryObject.IsCollectionsEnabled = createDiaryRequest.IsCollectionsEnabled;
+            diaryObject.IsCurationsEnabled = createDiaryRequest.IsCurationsEnabled;
+            diaryObject.IsGroupDiary = createDiaryRequest.IsGroupDiary;
+            return diaryObject;
         }
 
         public async void PatchDiary(PatchObject patchObject, string dairyId, string userId)

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+using Rewind.Core;
 using Rewind.Objects;
 using System;
 using System.Collections.Generic;
@@ -24,11 +27,40 @@ namespace Rewind.Access
             return true;
         }
 
-        public async Task<bool> CreateStoriesAsync(List<Story> storiesToBeCreated)
+        public async Task<bool> RetrieveStoryAsync(string storyId)
         {
             var storiesCollection = RewindDatabase.GetCollection<Story>("stories");
-            await storiesCollection.InsertManyAsync(storiesToBeCreated);
+
+            using (var cursor = await storiesCollection.Find(x => x._id == new ObjectId(storyId)).ToCursorAsync())
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    foreach (var doc in cursor.Current)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(doc));
+                        // do something with the documents
+                    }
+                }
+            }
             return true;
+        }
+
+
+
+        public async Task<bool> CreateStoriesAsync(List<Story> storiesToBeCreated)
+        {
+            try
+            {
+                var storiesCollection = RewindDatabase.GetCollection<Story>("stories");
+                await storiesCollection.InsertManyAsync(storiesToBeCreated);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                LoggerHelper.LogError(exception);
+                throw;
+            }
+
         }
 
     }

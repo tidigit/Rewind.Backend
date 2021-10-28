@@ -22,12 +22,14 @@ namespace Rewind.Core
             throw new NotImplementedException();
         }
 
-        public async void CreateStories(List<Story> stories, string userId)
+        public async Task<bool> CreateStories(List<Story> stories, string userId)
         {
+            var isCreationSuccess = false;
             try
             {
                 _ = stories.Select(x => x._userId == new ObjectId(userId));
-                await new StoryAccess(_config).CreateStoriesAsync(stories);
+                isCreationSuccess = await new StoryAccess(_config).CreateStoriesAsync(stories);
+                return isCreationSuccess;
             }
             catch (Exception exception)
             {

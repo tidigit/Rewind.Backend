@@ -41,11 +41,11 @@ namespace Rewind.Api.Controllers
 
         [Route("Create")]
         [HttpPost]
-        public IActionResult CreateStory(CreateStoryRequest createStoryRequest)
+        public async Task<IActionResult> CreateStory(CreateStoryRequest createStoryRequest)
         {
-            if(createStoryRequest != null)
+            if (createStoryRequest != null)
             {
-                new StoryCore(_config).CreateStories(createStoryRequest.StoriesToCreate, createStoryRequest.UserId);
+                await new StoryCore(_config).CreateStories(createStoryRequest.StoriesToCreate, createStoryRequest.UserId);
             }
             //todo validations and operation success result
             return Ok(true);

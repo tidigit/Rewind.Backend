@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Rewind.Core;
+using Rewind.Objects;
 using Rewind.Objects.TransportObjects;
 using System;
 using System.Collections.Generic;
@@ -29,9 +30,10 @@ namespace Rewind.Api.Controllers
 
         // GET api/<DiariesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<Diary> Get(string id)
         {
-            return "value";
+            var diary = await new DiaryCore(_config).RetrieveDiaryAsync(id);
+            return diary;
         }
 
         // POST api/<DiariesController>
@@ -53,14 +55,14 @@ namespace Rewind.Api.Controllers
         }
 
 
-        
+
         [Route("Create")]
         [HttpPost]
-        public IActionResult CreateDiary(CreateDiaryRequest createDiaryRequest)
+        public async Task<IActionResult> CreateDiaryAsync(CreateDiaryRequest createDiaryRequest)
         {
-            if(createDiaryRequest != null)
+            if (createDiaryRequest != null)
             {
-                new DiaryCore(_config).CreateDiary(createDiaryRequest.DiaryName, createDiaryRequest.UserId);
+                await new DiaryCore(_config).CreateDiaryAsync(createDiaryRequest);
             }
             //todo validations and operation success result
             return Ok(true);
