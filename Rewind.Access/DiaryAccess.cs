@@ -19,12 +19,26 @@ namespace Rewind.Access
         {
 
         }
-
+        public async Task<List<Diary>> RetrieveMultipleDiariesAsync(string storyId, string type)
+        {
+            switch (type)
+            {
+                case "active":
+                    break;
+                case "archived":
+                    break;
+                case "hidden":
+                    break;
+                case "group":
+                    break;
+            }
+            return null;
+        }
         public async Task<Diary> RetrieveDiaryAsync(string storyId)
         {
             var storiesCollection = RewindDatabase.GetCollection<Diary>("diaries");
             var diary = new Diary();
-            using (var cursor = await storiesCollection.Find(x => x._id == new ObjectId(storyId)).ToCursorAsync())
+            using (var cursor = await storiesCollection.Find(x => ((IResource)x)._id == new ObjectId(storyId)).ToCursorAsync())
             {
                 while (await cursor.MoveNextAsync())
                 {
@@ -60,7 +74,7 @@ namespace Rewind.Access
             try
             {
                 var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
-                await diariesCollection.UpdateOneAsync(Builders<Diary>.Filter.Eq(p => p._id, new ObjectId(diaryId)), diaryUpdateDefinition);
+                await diariesCollection.UpdateOneAsync(Builders<Diary>.Filter.Eq(p => ((IResource)p)._id, new ObjectId(diaryId)), diaryUpdateDefinition);
                 return true;
             }
             catch (Exception e)
@@ -76,7 +90,7 @@ namespace Rewind.Access
             try
             {
                 var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
-                await diariesCollection.ReplaceOneAsync(Builders<Diary>.Filter.Eq(p => p._id, diaryToBeReplaced._id), diaryToBeReplaced);
+                await diariesCollection.ReplaceOneAsync(Builders<Diary>.Filter.Eq(p => ((IResource)p)._id, ((IResource)diaryToBeReplaced)._id), diaryToBeReplaced);
                 return true;
             }
             catch (Exception e)
@@ -92,7 +106,7 @@ namespace Rewind.Access
             try
             {
                 var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
-                await diariesCollection.DeleteOneAsync(Builders<Diary>.Filter.Eq(p => p._id, new ObjectId(diaryId)));
+                await diariesCollection.DeleteOneAsync(Builders<Diary>.Filter.Eq(p => ((IResource)p)._id, new ObjectId(diaryId)));
                 return true;
             }
             catch (Exception e)
