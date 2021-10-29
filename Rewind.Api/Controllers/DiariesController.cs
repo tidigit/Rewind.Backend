@@ -21,12 +21,19 @@ namespace Rewind.Api.Controllers
         {
             _config = configuration;
         }
+        //todo - validations and operation success result, responseObjects
 
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<DiaryBrowserResponse> Get(string userId, string mode)
         {
-            return new string[] { "value1", "value2" };
+            var diariesAsInBrowser = await new DiaryCore(_config).RetrieveDiaryBrowserAsync(userId, mode);
+            var diaryBrowserResponse = new DiaryBrowserResponse()
+            {
+                Diaries = diariesAsInBrowser
+            };
+            return diaryBrowserResponse;
         }
+
 
         [HttpGet("{id}")]
         public async Task<Diary> Get(string id)
@@ -50,20 +57,45 @@ namespace Rewind.Api.Controllers
             {
                 await new DiaryCore(_config).CreateDiaryAsync(createDiaryRequest);
             }
-            //todo validations and operation success result
+
             return Ok(true);
         }
 
+        [Route("CreateDiaryCover")]
+        [HttpPost]
+        public async Task<IActionResult> CreateDiaryCoverAsync(CreateDiaryCoverRequest createDiaryRequest)
+        {
+            var coverId = "";
+            if (createDiaryRequest != null)
+            {
+                coverId = await new DiaryCore(_config).AddUserDiaryCoverAsync(createDiaryRequest.Image);
+            }
+
+            return Ok(coverId);
+        }
+
+
         [Route("Patch")]
         [HttpPatch]
-        public async Task<IActionResult> PatchDiaryAsync(PatchDiaryRequest patchDiaryRequest)
+        public async Task<IActionResult> PatchDiaryAsync(PatchResourceRequest patchDiaryRequest)
         {
             if (patchDiaryRequest != null)
             {
-                await new DiaryCore(_config).PatchDiaryAsync(patchDiaryRequest.Patches, patchDiaryRequest.DiaryId.Id, patchDiaryRequest.UserId);
+                await new DiaryCore(_config).PatchDiaryAsync(patchDiaryRequest.PatchObjects[0].Patches, patchDiaryRequest.PatchObjects[0].ResourceId.Id, patchDiaryRequest.UserId);
             }
-            //todo validations and operation success result
             return Ok(true);
         }
+
+        [Route("PatchMultiple")]
+        [HttpPatch]
+        public async Task<IActionResult> PatchMultipleDiairesAsync(PatchResourceRequest patchDiaryRequest)
+        {
+            if (patchDiaryRequest != null)
+            {
+                await new DiaryCore(_config).PatchMultipleDiariesAsync(patchDiaryRequest.PatchObjects, patchDiaryRequest.UserId);
+            }
+            return Ok(true);
+        }
+
     }
 }
