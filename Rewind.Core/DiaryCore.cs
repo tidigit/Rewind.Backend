@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using Rewind.Access;
 using Rewind.Objects;
 using Rewind.Objects.TransportObjects;
@@ -26,6 +27,21 @@ namespace Rewind.Core
             {
                 diary = await new DiaryAccess(_config).RetrieveDiaryAsync(diaryId);
                 return diary;
+            }
+            catch (Exception exception)
+            {
+                LoggerHelper.LogError(exception);
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteDiaryAsync(string diaryId)
+        {
+            var isDeleteSuccessful = false;
+            try
+            {
+                isDeleteSuccessful = await new DiaryAccess(_config).DeleteDiaryAsync(diaryId);
+                return isDeleteSuccessful;
             }
             catch (Exception exception)
             {
@@ -64,29 +80,43 @@ namespace Rewind.Core
             return diaryObject;
         }
 
-        public async void PatchDiary(PatchObject patchObject, string dairyId, string userId)
+        public async Task<bool> PatchDiaryAsync(List<Patch> patches, string dairyId, string userId)
         {
+            var isPatchSuccess = false;
             try
             {
-                var currentDairy = RetrieveDairy(dairyId);
-                if (patchObject.Patches.Count > 0)
+                var diaryOnDatabase = await RetrieveDiaryAsync(dairyId);
+                if (patches.Count > 0)
                 {
-                    foreach (var currentPatch in patchObject.Patches)
+                    foreach (var currentPatch in patches)
                     {
                         switch (currentPatch.Field)
                         {
                             case "name":
-                                currentDairy.Name = currentPatch.Value;
+                                diaryOnDatabase.Name = currentPatch.Value;
                                 break;
                             case "cover":
+                                diaryOnDatabase.CoverId = new ObjectId(currentPatch.Value);
                                 break;
-
+                            case "isHidden":
+                                diaryOnDatabase.IsHidden = Convert.ToBoolean(currentPatch.Value);
+                                break;
+                            case "isArchived":
+                                diaryOnDatabase.IsArchived = Convert.ToBoolean(currentPatch.Value);
+                                break;
+                            case "coWriting" when currentPatch.Operation == "Remove":
+                                var initialContributors = diaryOnDatabase.PartnerSettings.Contributors;
+                                initialContributors.Remove(new ObjectId(currentPatch.Value));
+                                break;
+                            case "coWriting" when currentPatch.Operation == "Add":
+                                diaryOnDatabase.PartnerSettings.Contributors.Add(new ObjectId(currentPatch.Value));
+                                break;
                         }
-
                     }
-
                 }
-                //await new DiaryAccess(_config).CreateDiaryAsync(diaryToBeCreated);
+                await new DiaryAccess(_config).ReplaceDiaryAsync(diaryOnDatabase);
+                //await new DiaryAccess(_config).PatchDiaryAsync(updateDefinition);
+                return isPatchSuccess;
             }
             catch (Exception exception)
             {
@@ -95,9 +125,5 @@ namespace Rewind.Core
             }
         }
 
-        private Diary RetrieveDairy(string dairyId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

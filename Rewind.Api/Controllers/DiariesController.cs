@@ -21,14 +21,13 @@ namespace Rewind.Api.Controllers
         {
             _config = configuration;
         }
-        // GET: api/<DiariesController>
+
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<DiariesController>/5
         [HttpGet("{id}")]
         public async Task<Diary> Get(string id)
         {
@@ -36,25 +35,12 @@ namespace Rewind.Api.Controllers
             return diary;
         }
 
-        // POST api/<DiariesController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<DiariesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<DiariesController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<bool> Delete(string id)
         {
+            var diary = await new DiaryCore(_config).DeleteDiaryAsync(id);
+            return diary;
         }
-
-
 
         [Route("Create")]
         [HttpPost]
@@ -63,6 +49,18 @@ namespace Rewind.Api.Controllers
             if (createDiaryRequest != null)
             {
                 await new DiaryCore(_config).CreateDiaryAsync(createDiaryRequest);
+            }
+            //todo validations and operation success result
+            return Ok(true);
+        }
+
+        [Route("Patch")]
+        [HttpPatch]
+        public async Task<IActionResult> PatchDiaryAsync(PatchDiaryRequest patchDiaryRequest)
+        {
+            if (patchDiaryRequest != null)
+            {
+                await new DiaryCore(_config).PatchDiaryAsync(patchDiaryRequest.Patches, patchDiaryRequest.DiaryId.Id, patchDiaryRequest.UserId);
             }
             //todo validations and operation success result
             return Ok(true);

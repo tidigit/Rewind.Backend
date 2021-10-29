@@ -55,6 +55,53 @@ namespace Rewind.Access
 
         }
 
+        public async Task<bool> PatchDiaryAsync(UpdateDefinition<Diary> diaryUpdateDefinition, string diaryId)
+        {
+            try
+            {
+                var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
+                await diariesCollection.UpdateOneAsync(Builders<Diary>.Filter.Eq(p => p._id, new ObjectId(diaryId)), diaryUpdateDefinition);
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.LogError(e);
+                throw;
+            }
+
+        }
+
+        public async Task<bool> ReplaceDiaryAsync(Diary diaryToBeReplaced)
+        {
+            try
+            {
+                var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
+                await diariesCollection.ReplaceOneAsync(Builders<Diary>.Filter.Eq(p => p._id, diaryToBeReplaced._id), diaryToBeReplaced);
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.LogError(e);
+                throw;
+            }
+
+        }
+
+        public async Task<bool> DeleteDiaryAsync(string diaryId)
+        {
+            try
+            {
+                var diariesCollection = RewindDatabase.GetCollection<Diary>("diaries");
+                await diariesCollection.DeleteOneAsync(Builders<Diary>.Filter.Eq(p => p._id, new ObjectId(diaryId)));
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.LogError(e);
+                throw;
+            }
+
+        }
 
 
     }
